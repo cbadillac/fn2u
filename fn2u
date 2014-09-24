@@ -30,7 +30,7 @@ function todo() {
 				done
 				VAR=$VARAUX
 				if [[ $2 == 1 ]]; then #n=1 solo lista los directorios a cambiar
-					echo "$i to $VAR"
+					echo "DIR___ $i to $VAR"
 				elif [[ $2 == 2 ]]; then #n=2 realiza los cambios
 					mv "${i}" "${VAR}"
 					echo "Changed $i to $VAR"
@@ -42,53 +42,57 @@ function todo() {
 			todo "${i}" $2
 			continue
 		fi
-		if [[ $i =~ $PAT ]] #si el archivo es candidato a cambios
-		then
+		if test -f "${i}"; then
 			#statements
-			VAR=$(echo $i | awk '{
-				gsub(/Ñ/, "N", $0)
-				gsub(/ñ/, "n", $0)
-				gsub(/á/, "a", $0)
-				gsub(/é/, "e", $0)
-				gsub(/í/, "i", $0)
-				gsub(/ó/, "o", $0)
-				gsub(/ú/, "u", $0)
-				gsub(/ /, "_", $0)
-				print $0
-			}')
-			COUNTER=0;
-			VARAUX=$VAR
-			if echo "$VARAUX" | grep -q "\." #si el archivo tiene un punto
-        	then
-            	extension=".${VAR#*.}"
-            	NAME="${VAR%%.*}"
-            	while [[ -f $VARAUX ]]; do #compruba si existe el nombre
+			if [[ $i =~ $PAT ]] #si el archivo es candidato a cambios
+			then
 				#statements
-				COUNTER=$[$COUNTER +1]
-				VARAUX=$NAME$UNDER$COUNTER$extension
-				done
-
-            else
-            	while [[ -f $VARAUX ]]; do #comprueba si existe el nombre
+				VAR=$(echo $i | awk '{
+					gsub(/Ñ/, "N", $0)
+					gsub(/ñ/, "n", $0)
+					gsub(/á/, "a", $0)
+					gsub(/é/, "e", $0)
+					gsub(/í/, "i", $0)
+					gsub(/ó/, "o", $0)
+					gsub(/ú/, "u", $0)
+					gsub(/ /, "_", $0)
+					print $0
+				}')
+				COUNTER=0;
+				VARAUX=$VAR
+				if echo "$VARAUX" | grep -q "\." #si el archivo tiene un punto
+	        	then
+	            	extension=".${VAR#*.}"
+	            	NAME="${VAR%%.*}"
+	            	while [[ -f $VARAUX ]]; do #compruba si existe el nombre
 					#statements
 					COUNTER=$[$COUNTER +1]
-					VARAUX=$VAR$UNDER$COUNTER
-				done
+					VARAUX=$NAME$UNDER$COUNTER$extension
+					done
 
-        	fi
+	            else
+	            	while [[ -f $VARAUX ]]; do #comprueba si existe el nombre
+						#statements
+						COUNTER=$[$COUNTER +1]
+						VARAUX=$VAR$UNDER$COUNTER
+					done
 
-			VAR=$VARAUX
-			if [[ $2 == 1 ]]; then #n=1 lista los cambios
-				#statements
-				echo "$i to $VAR"
-			elif [[ $2 == 2 ]]; then #n=2 Realiza los cambios
-				#statements
-				mv "${i}" "${VAR}"
-				echo "Changed $i to $VAR"
-			else
-				echo "Invalid argument n= $2 (n is 1 or 2)"
+	        	fi
+
+				VAR=$VARAUX
+				if [[ $2 == 1 ]]; then #n=1 lista los cambios
+					#statements
+					echo "$i to $VAR"
+				elif [[ $2 == 2 ]]; then #n=2 Realiza los cambios
+					#statements
+					mv "${i}" "${VAR}"
+					echo "Changed $i to $VAR"
+				else
+					echo "Invalid argument n= $2 (n is 1 or 2)"
+				fi
 			fi
 		fi
+		
 	done	
 }
 case $# in #Comprueba los argumentos
